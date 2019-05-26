@@ -1,7 +1,8 @@
 # -*- coding: utf-8 -*-
 from django.conf import settings
-from django.core.urlresolvers import resolve
+from django.urls import resolve
 from django.shortcuts import redirect
+from django.utils.deprecation import MiddlewareMixin
 
 from .utils import subscriber_has_active_subscription
 from .settings import subscriber_request_callback
@@ -25,7 +26,7 @@ EXEMPT = list(DJSTRIPE_SUBSCRIPTION_REQUIRED_EXCEPTION_URLS)
 EXEMPT.append("[djstripe]")
 
 
-class SubscriptionPaymentMiddleware(object):
+class SubscriptionPaymentMiddleware(MiddlewareMixin):
     """
     Rules:
 

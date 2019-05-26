@@ -41,7 +41,7 @@ class EventProcessingException(TimeStampedModel):
         in the admin interface.
     """
 
-    event = models.ForeignKey("Event", null=True)
+    event = models.ForeignKey("Event", null=True, on_delete=models.SET_NULL)
     data = models.TextField()
     message = models.CharField(max_length=500)
     traceback = models.TextField()
@@ -65,7 +65,7 @@ class EventProcessingException(TimeStampedModel):
 
 
 class Event(StripeEvent):
-    customer = models.ForeignKey("Customer", null=True)
+    customer = models.ForeignKey("Customer", null=True, on_delete=models.SET_NULL)
     validated_message = JSONField(null=True)
     valid = models.NullBooleanField(null=True)
     processed = models.BooleanField(default=False)
@@ -127,7 +127,9 @@ class Event(StripeEvent):
 
 
 class Transfer(StripeTransfer):
-    event = models.ForeignKey(Event, related_name="transfers")
+    event = models.ForeignKey(
+        Event, related_name="transfers", on_delete=models.CASCADE
+    )
 
     objects = TransferManager()
 
@@ -161,7 +163,9 @@ class Transfer(StripeTransfer):
 
 
 class TransferChargeFee(TimeStampedModel):
-    transfer = models.ForeignKey(Transfer, related_name="charge_fee_details")
+    transfer = models.ForeignKey(
+        Transfer, related_name="charge_fee_details", on_delete=models.CASCADE
+    )
     amount = models.DecimalField(decimal_places=2, max_digits=7)
     application = models.TextField(null=True, blank=True)
     description = models.TextField(null=True, blank=True)
@@ -169,7 +173,7 @@ class TransferChargeFee(TimeStampedModel):
 
 
 class Customer(StripeCustomer):
-    subscriber = models.OneToOneField(getattr(settings, 'DJSTRIPE_SUBSCRIBER_MODEL', settings.AUTH_USER_MODEL), null=True)
+    subscriber = models.OneToOneField(getattr(settings, 'DJSTRIPE_SUBSCRIBER_MODEL', settings.AUTH_USER_MODEL), null=True, on_delete=models.SET_NULL)
     date_purged = models.DateTimeField(null=True, editable=False)
 
     objects = CustomerManager()
@@ -436,7 +440,8 @@ class CurrentSubscription(TimeStampedModel):
     customer = models.OneToOneField(
         Customer,
         related_name="current_subscription",
-        null=True
+        null=True,
+        on_delete=models.SET_NULL
     )
     plan = models.CharField(max_length=100)
     quantity = models.IntegerField()
@@ -508,7 +513,9 @@ class CurrentSubscription(TimeStampedModel):
 
 class Invoice(StripeInvoice):
 
-    customer = models.ForeignKey(Customer, related_name="invoices")
+    customer = models.ForeignKey(
+        Customer, related_name="invoices", on_delete=models.CASCADE
+    )
 
     class Meta:
         ordering = ["-date"]
@@ -591,7 +598,9 @@ class InvoiceItem(TimeStampedModel):
     """
 
     stripe_id = models.CharField(max_length=50)
-    invoice = models.ForeignKey(Invoice, related_name="items")
+    invoice = models.ForeignKey(
+        Invoice, related_name="items", on_delete=models.CASCADE
+    )
     amount = models.DecimalField(decimal_places=2, max_digits=7)
     currency = models.CharField(max_length=10)
     period_start = models.DateTimeField()
@@ -612,8 +621,12 @@ class InvoiceItem(TimeStampedModel):
 class Charge(StripeCharge):
     stripe_api_name = "Charge"
 
-    customer = models.ForeignKey(Customer, related_name="charges")
-    invoice = models.ForeignKey(Invoice, null=True, related_name="charges")
+    customer = models.ForeignKey(
+        Customer, related_name="charges", on_delete=models.CASCADE
+    )
+    invoice = models.ForeignKey(
+        Invoice, null=True, related_name="charges", on_delete=models.CASCADE
+    )
 
     objects = ChargeManager()
 

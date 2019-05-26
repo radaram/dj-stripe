@@ -20,7 +20,7 @@ class Migration(migrations.Migration):
         migrations.AlterField(
             model_name='customer',
             name='subscriber',
-            field=models.OneToOneField(null=True, to=DJSTRIPE_UNSAFE_SUBSCRIBER_MODEL),
+            field=models.OneToOneField(null=True, to=DJSTRIPE_UNSAFE_SUBSCRIBER_MODEL, on_delete=models.SET_NULL),
             preserve_default=True,
         ),
     ]
