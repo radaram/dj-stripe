@@ -8,13 +8,15 @@ import traceback as exception_traceback
 import warnings
 import logging
 
+from six import python_2_unicode_compatible
+
 from django.conf import settings
 from django.contrib.sites.models import Site
 from django.core.mail import EmailMessage
 from django.db import models
 from django.template.loader import render_to_string
 from django.utils import timezone
-from django.utils.encoding import python_2_unicode_compatible, smart_text
+from django.utils.encoding import smart_str
 
 from jsonfield.fields import JSONField
 from model_utils.models import TimeStampedModel
@@ -196,7 +198,7 @@ class Customer(StripeCustomer):
 
     def str_parts(self):
         return [
-            smart_text(self.subscriber),
+            smart_str(self.subscriber),
             "email={email}".format(email=self.subscriber.email),
         ] + super(Customer, self).str_parts()
 
@@ -612,7 +614,7 @@ class InvoiceItem(TimeStampedModel):
     quantity = models.IntegerField(null=True)
 
     def __str__(self):
-        return "<amount={amount}, plan={plan}, stripe_id={stripe_id}>".format(amount=self.amount, plan=smart_text(self.plan), stripe_id=self.stripe_id)
+        return "<amount={amount}, plan={plan}, stripe_id={stripe_id}>".format(amount=self.amount, plan=smart_str(self.plan), stripe_id=self.stripe_id)
 
     def plan_display(self):
         return djstripe_settings.PAYMENTS_PLANS[self.plan]["name"]
@@ -720,7 +722,7 @@ class Plan(StripePlan):
     trial_period_days = models.IntegerField(null=True)
 
     def str_parts(self):
-        return [smart_text(self.name)] + super(Plan, self).str_parts()
+        return [smart_str(self.name)] + super(Plan, self).str_parts()
 
     @classmethod
     def create(cls, **kwargs):

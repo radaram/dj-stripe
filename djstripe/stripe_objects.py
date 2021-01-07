@@ -20,10 +20,12 @@ from contextlib import contextmanager
 import datetime
 import decimal
 
+from six import python_2_unicode_compatible
+
 from django.conf import settings
 from django.db import models
 from django.utils import timezone
-from django.utils.encoding import python_2_unicode_compatible, smart_text
+from django.utils.encoding import smart_str
 from jsonfield import JSONField
 
 from model_utils.models import TimeStampedModel
@@ -360,7 +362,7 @@ class StripeInvoice(StripeObject):
     def str_parts(self):
         return [
             "total={total}".format(total=self.total),
-            "paid={paid}".format(paid=smart_text(self.paid)),
+            "paid={paid}".format(paid=smart_str(self.paid)),
         ] + super(StripeInvoice, self).str_parts()
 
     def retry(self):
@@ -423,7 +425,7 @@ class StripeCharge(StripeObject):
     def str_parts(self):
         return [
             "amount={amount}".format(amount=self.amount),
-            "paid={paid}".format(paid=smart_text(self.paid)),
+            "paid={paid}".format(paid=smart_str(self.paid)),
         ] + super(StripeCharge, self).str_parts()
 
     def calculate_refund_amount(self, amount=None):

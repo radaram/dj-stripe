@@ -54,7 +54,7 @@ readme = open('README.rst').read()
 history = open('HISTORY.rst').read().replace('.. :changelog:', '')
 
 INSTALL_REQUIRES = [
-    'django!=1.9,>=1.8',
+    'django>=1.8',
     'stripe>=1.22.2',
     'django-model-utils>=2.2',
     'django-braces>=1.8.0',
